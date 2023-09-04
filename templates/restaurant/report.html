@@ -1,0 +1,138 @@
+{% extends 'restaurant/dashboard.html' %}
+{% block script %} 
+
+{% endblock %}   
+{% block page %}
+
+ <div class="container-scroller">
+
+    
+
+
+      <div class="container-fluid page-body-wrapper">
+
+
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title">  </h3>
+              
+            </div>
+
+
+            <div class="row">
+              <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">3 principais refeições</h4>
+                    <canvas id="lineChart" style="height:250px"></canvas>
+                    <script>
+                var ctx = document.getElementById("mealChart").getContext("2d");
+                var data = {
+                    labels: {{ meal.labels|safe }},
+                    datasets: [
+                        {
+                            backgroundColor: [
+                              "#36A2EB", "#FFCE56", "#FF6384"
+                            ],
+                            data: {{ meal.data }}
+                        }
+                    ]
+                };
+
+                new Chart(ctx, {
+                  type: 'pie',
+                  data: data
+                });
+
+            </script>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">3 principais motoristas</h4>
+                    <canvas id="barChart" style="height:230px"></canvas>
+                    <script>
+                var ctx = document.getElementById("driverChart").getContext("2d");
+                var data = {
+                    labels: {{ driver.labels|safe }},
+                    datasets: [
+                        {
+                            backgroundColor: [
+                              "#36A2EB", "#FFCE56", "#FF6384"
+                            ],
+                            data: {{ driver.data }}
+                        }
+                    ]
+                };
+
+                new Chart(ctx, {
+                  type: 'pie',
+                  data: data
+                });
+
+            </script>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="row">
+              <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">3 principais clientes</h4>
+                    <canvas id="areaChart" style="height:250px"></canvas>
+                    <script>
+              var ctx = document.getElementById("customerChart").getContext("2d");
+              var data = {
+                  labels: {{ customer.labels|safe }},
+                  datasets: [
+                      {
+                          backgroundColor: [
+                            "#36A2EB", "#FFCE56", "#FF6384"
+                          ],
+                          data: {{customer.data }}
+                      }
+                  ]
+              };   
+
+              new Chart(ctx, {
+                type: 'pie',
+                data: data
+              });
+
+          </script>
+                  </div>
+                </div>
+              </div>
+
+
+             
+            </div>
+
+            <div class="row">
+              
+
+             
+            </div>
+          </div>
+          <!-- content-wrapper ends -->
+
+
+         
+
+
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+
+{% endblock %}
+   

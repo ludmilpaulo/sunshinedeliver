@@ -1,0 +1,66 @@
+{% extends 'restaurant/dashboard.html' %}
+
+{% block page %}
+
+
+      
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+       
+        <!-- partial -->
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title">Refeições </h3>
+              
+            </div>
+
+
+            <div class="row">
+              <div class="col-lg-12 stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    
+                    <div class="table-responsive">
+                      <table class="table table-bordered table-contextual">
+                        <thead>
+                          <tr>
+                            <th> No </th>
+                            <th> Nome </th>
+                            <th> Pequena descrição </th>
+                            <th> Preço </th>
+                            <th> Imagem </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for meal in meals %}
+                          <tr class="table-info">
+                            <td> {{ meal.id }} </td>
+                            <td style="color:white"> <a style="color:white;" href="{% url 'restaurant-edit-meal' meal.id %}">{{ meal.name }} </td>
+                            <td> {{ meal.short_description }} </td>
+                            <td> {{ meal.price }} Kz </td>
+                            <td class="text-center"><img class="img-rounded"
+                              src="{{ MEDIA_URL }}{{ meal.image }}" width="50" height="50"></td>
+                          </tr>
+                          
+                          {% endfor %}
+                         
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- content-wrapper ends -->
+          <!-- partial:../../partials/_footer.html -->
+         
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+   
+
+{% endblock %}

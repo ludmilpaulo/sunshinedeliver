@@ -1,0 +1,64 @@
+{% extends 'restaurant/dashboard.html' %}
+
+{% block page %}
+<div class="row ">
+              <div class="col-12 grid-margin">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">Pedidos</h4>
+                    <div class="table-responsive">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            
+                            <th style="color:white;"> No </th>
+                            <th style="color:white;"> Detalhes do Pedido </th>
+                            <th style="color:white;"> Cliente </th>
+                            <th style="color:white;"> Motorista </th>
+                            <th style="color:white;"> Total </th>
+                            <th style="color:white;"> Status </th>
+                            <th style="color:white;"> Açao </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                          <tr>
+                            <td style="color:white;">
+                              {{ order.id }}
+                            
+                            </td>
+                            <td style="color:white;">
+                              {% for od in order.order_details.all %}
+                                  {{ od.meal.name }} {{ od.meal.price }}
+                                  x {{ od.quantity }} = {{ od.sub_total }}kz
+                              {% endfor %}
+                            </td>
+                            <td style="color:white;"> {{ order.customer }} </td>
+                            <td style="color:white;"> {{ order.driver }} </td>
+                            <td style="color:white;"> {{ order.total }} </td>
+                            <td style="color:white;"> {{ order.get_status_display }} </td>
+        
+                            <td>
+                              {% if order.status == 1 %}
+                                    <form method="POST">
+                                      {% csrf_token %}
+                                      <input name="id" value="{{ order.id }}" hidden>
+                                      <button class="badge badge-outline-success">Chamar Motorista</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                          </tr>
+
+                           {% endfor %}
+                        
+                         
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+{% endblock %}
+  

@@ -1,0 +1,235 @@
+{% extends 'restaurant/home.html' %}
+
+{% block title %}Restaurante{% endblock %}
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            var now = new Date();
+            setInterval(function() {
+                $.ajax({
+                    url: '/api/restaurant/order/notification/' + now.toISOString() + '/',
+                    method: 'GET',
+                    success: function(data) {
+                        if (data['notification'] === 0) {
+                            $('.badge').text('');
+                        } else {
+                            $('.badge').text(data['notification']);
+                        }
+                    }
+                })
+            }, 1000)
+        })
+
+    </script>
+{% endblock %}
+
+{% block sidebar %}
+
+    {% url 'restaurant-order' as restaurant_order_url %}
+    {% url 'restaurant-meal' as restaurant_meal_url %}
+    {% url 'restaurant-report' as restaurant_report_url %}
+    {% url 'restaurant-customers' as restaurant_customers_url %}
+    {% url 'restaurant-drivers' as restaurant_drivers_url %}
+    {% url 'restaurant-account' as restaurant_account_url %}
+
+<div class="container-scroller">
+      <!-- partial:../../partials/_sidebar.html -->
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+
+
+
+        <ul class="nav">
+          <li class="nav-item profile">
+            <div class="profile-desc">
+              <div class="profile-pic">
+                <div class="count-indicator">
+                  <img class="img-xs rounded-circle " src="{{ MEDIA_URL }}{{ request.user.restaurant.logo }}" alt="">
+                  <span class="count bg-success"></span>
+                </div>
+                <div class="profile-name">
+                  <h5 class="mb-0 font-weight-normal">{{ request.user.restaurant.name }}</h5>
+                  <span></span>
+                </div>
+              </div>
+
+
+
+          <li class="nav-item nav-category">
+            <span class="nav-link">Painel</span>
+          </li>
+
+          <li class="nav-item menu-items">
+            <a href="{% url 'restaurant-order' %}" class="nav-link {% if request.path == restaurant_order_url %} active {% endif %}">
+              <span class="menu-icon">
+                <i class="mdi mdi-laptop"></i>
+              </span>
+              <span class="menu-title">Pedidos</span>
+            </a>
+
+          </li>
+
+
+          <li class="nav-item menu-items">
+            <a href="{% url 'restaurant-meal' %}"  class="nav-link {% if request.path == restaurant_meal_url %} active {% endif %} ">
+              <span class="menu-icon">
+                <i class="mdi mdi-contacts"></i>
+              </span>
+              <span class="menu-title">Refeições</span>
+              <i class="menu-arrow"></i>
+            </a>
+
+          </li>
+
+
+          <li class="nav-item menu-items">
+            <a class="nav-link {% if request.path == restaurant_report_url %} active {% endif %}" href="{% url 'restaurant-report' %}">
+              <span class="menu-icon">
+                <i class="mdi mdi-chart-bar"></i>
+              </span>
+              <span class="menu-title">Relatórios</span>
+            </a>
+          </li>
+
+
+          <li class="nav-item menu-items">
+            <a class="nav-link {% if request.path == restaurant_customers_url %} active {% endif %}" href="{% url 'restaurant-customers' %}">
+              <span class="menu-icon">
+                <i class="mdi mdi-table-large"></i>
+              </span>
+              <span class="menu-title">Clientes</span>
+            </a>
+          </li>
+
+
+          <li class="nav-item menu-items">
+            <a class="nav-link {% if request.path == restaurant_drivers_url %} active {% endif %}" href="{% url 'restaurant-drivers' %}">
+              <span class="menu-icon">
+                <i class="mdi mdi-chart-bar"></i>
+              </span>
+              <span class="menu-title">Motoristas</span>
+            </a>
+          </li>
+
+          <li class="nav-item menu-items">
+            <a class="nav-link {% if request.path == restaurant_account_url %} active {% endif %}" href="{% url 'restaurant-account' %}">
+              <span class="menu-icon">
+                <i class="mdi mdi-contacts"></i>
+              </span>
+              <span class="menu-title">Conta</span>
+            </a>
+          </li>
+
+
+
+
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="{% url 'restaurant-sign-out' %}?next={{ request.path }}">
+              <span class="menu-icon">
+                <i class="mdi mdi-logout text-danger"></i>
+              </span>
+              <span class="menu-title">Sair</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        <!-- partial:../../partials/_navbar.html -->
+        <nav class="navbar p-0 fixed-top d-flex flex-row">
+          <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+            <a class="navbar-brand brand-logo-mini" href="../../index.html"><img src="../../assets/images/logo-mini.svg" alt="logo" /></a>
+          </div>
+          <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+
+
+            <ul class="navbar-nav navbar-nav-right">
+              <li class="nav-item dropdown d-none d-lg-block">
+                <a class="nav-link btn btn-success create-new-button" href="{% url 'restaurant-add-meal' %}">+ Adicionar Refeição</a>
+
+              </li>
+
+              <li class="nav-item dropdown">
+                <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown">
+                  <div class="navbar-profile">
+                    <img class="img-xs rounded-circle" src="{{ MEDIA_URL }}{{ request.user.restaurant.logo }}" alt="">
+                    <p class="mb-0 d-none d-sm-block navbar-profile-name">{{ request.user.get_full_name }}</p>
+                    <i class="mdi mdi-menu-down d-none d-sm-block"></i>
+                  </div>
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
+                  <h6 class="p-3 mb-0">Profile</h6>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item" href="{% url 'restaurant-account' %}">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-settings text-success"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1">Configurações</p>
+                    </div>
+                  </a>
+                  {% if request.user.is_superuser %}
+                   <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item" href="https://www.sunshinedeliver.com/admin/">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-logout text-danger"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1">Administration</p>
+                    </div>
+                  </a>
+                  <a class="dropdown-item preview-item" href="https://sso.godaddy.com/login?realm=pass&app=ox">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-logout text-danger"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1">Email</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  {% endif %}
+
+
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item preview-item" href="{% url 'restaurant-sign-out' %}?next={{ request.path }}">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-dark rounded-circle">
+                        <i class="mdi mdi-logout text-danger"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <p class="preview-subject mb-1">Sair</p>
+                    </div>
+                  </a>
+                  <div class="dropdown-divider"></div>
+
+
+                </div>
+              </li>
+            </ul>
+
+             <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+              <span class="mdi mdi-format-line-spacing"></span>
+            </button>
+
+          </div>
+        </nav>
+
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+
+
+
+
+
+{% endblock %}

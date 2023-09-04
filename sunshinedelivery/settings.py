@@ -18,8 +18,8 @@ SECRET_KEY = 'django-insecure-q_=y*c)u20+-qs9f@jst!t=f1v4=^##(cx1050psyf&+@-f!@v
 DEBUG = True
 
 ALLOWED_HOSTS = [
-'www.sunshinedeliver.com',
-'sunshinedeliver.com',
+'*'
+
 ]
 
 
@@ -36,27 +36,13 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'corsheaders',
 
-    'bootstrap5',
-    'Gestão',
+   # 'bootstrap5',
+    'Gestao',
     'accounts',
-
-    'oauth2_provider',
-    'rest_framework_social_oauth2',
 
       # 3rd-party apps
     'rest_framework',
     'rest_framework.authtoken',
-    'allauth', # new
-    'allauth.account', # new
-    'allauth.socialaccount', # new
-    'rest_auth',
-    'rest_auth.registration', # ne
-
-
-    'social_django',  # django social auth
-    'rest_social_auth',  # this package
-    'fullurl',
-   # 'knox',  # Only if you use django-rest-knox
 ]
 
 REST_FRAMEWORK = {
@@ -75,7 +61,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-AUTH_USER_MODEL="Gestão.User"
+AUTH_USER_MODEL="Gestao.User"
 
 
 REST_SESSION_LOGIN = False
@@ -110,8 +96,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
-                'social_django.context_processors.backends',
-                'social_django.context_processors.login_redirect',
+               
                 # 'social.apps.django_app.context_processors.backends',
                 # 'social.apps.django_app.context_processors.login_redirect',
             ],
@@ -191,32 +176,20 @@ AUTHENTICATION_BACKENDS = (
     'social.backends.facebook.FacebookOAuth2',
     'rest_framework_social_oauth2.backends.DjangoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
+   
 )
 
-SOCIAL_AUTH_FACEBOOK_KEY = '536860831224289' # Facebook App ID
-SOCIAL_AUTH_FACEBOOK_SECRET = '6dd41689af45b1febe605a99e1bf9dda' # Facebook App Secret
-SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 
-SOCIAL_AUTH_PIPELINE = (
-    'social.pipeline.social_auth.social_details',
-    'social.pipeline.social_auth.social_uid',
-    'social.pipeline.social_auth.auth_allowed',
-    'social.pipeline.social_auth.social_user',
-    'social.pipeline.user.get_username',
-    'social.pipeline.user.create_user',
-    'Gestão.social_auth_pipeline.create_user_by_type',  # <--- set the path to the function
-    'social.pipeline.social_auth.associate_user',
-    'social.pipeline.social_auth.load_extra_data',
-    'social.pipeline.user.user_details',
-)
 
-# CORS_ORIGIN_WHITELIST = (
-#     'http://localhost:3000', 'htpp://localhost:4200'
-# )
+
 
 # Corsheaders settings
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = False
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Add your allowed origins here
+]
 
 # CORS_ORIGIN_WHITELIST = (
 #     '*'
@@ -240,17 +213,17 @@ CORS_ALLOW_CREDENTIALS = False
 #     "http://127.0.0.1:9000",
 # ]
 
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
-DEFAULT_HTTP_PROTOCOL           = "https"
-CORS_REPLACE_HTTPS_REFERER      = False
-HOST_SCHEME                     = "http://"
-SECURE_PROXY_SSL_HEADER         = None
-SECURE_SSL_REDIRECT             = True
-SESSION_COOKIE_SECURE           = False
-CSRF_COOKIE_SECURE              = False
-SECURE_HSTS_SECONDS             = None
-SECURE_HSTS_INCLUDE_SUBDOMAINS  = False
-SECURE_FRAME_DENY               = False
+#ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+#DEFAULT_HTTP_PROTOCOL           = "https"
+#CORS_REPLACE_HTTPS_REFERER      = False
+#HOST_SCHEME                     = "http://"
+#SECURE_PROXY_SSL_HEADER         = None
+#SECURE_SSL_REDIRECT             = True
+#SESSION_COOKIE_SECURE           = False
+#CSRF_COOKIE_SECURE              = False
+#SECURE_HSTS_SECONDS             = None
+#SECURE_HSTS_INCLUDE_SUBDOMAINS  = False
+#SECURE_FRAME_DENY               = False
 
 DEFAULT_FROM_EMAIL = 'contacto@vemlimpar.com'
 

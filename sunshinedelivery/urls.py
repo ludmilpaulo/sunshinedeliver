@@ -1,14 +1,15 @@
+from django import urls
 from django.conf import settings
 from django.conf.urls.static import static
-from django.conf.urls import include, url
+from django.conf.urls import include
 from django.contrib import admin
 
-from rest_auth.registration.views import VerifyEmailView
+
 
 from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from Gestão import views, apis
+from Gestao import views, apis
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -16,15 +17,14 @@ urlpatterns = [
      #####################################################
     path('signup/driver/', apis.DriverSignupView.as_view()),
     path('signup/', apis.CustomerSignupView.as_view()),
-    path('fornecedor/', apis.fornecedor_sign_up),
     path('login/',apis.CustomAuthToken.as_view(), name='auth-token'),
     path('logout/', apis.LogoutView.as_view(), name='logout-view'),
     ##############################################
+    path('fornecedor/', apis.fornecedor_sign_up),
 
-    path('api-auth/', include('rest_framework.urls')),
-    path('api/v1/rest-auth/', include('rest_auth.urls')), # new
-    path('api/v1/rest-auth/registration/', # new
-            include('rest_auth.registration.urls')),
+    ############################################################
+
+   
 
     path('restaurant/sign-in/', auth_views.LoginView.as_view(), {'template_name': 'restaurant/sign_in.html'}, name = 'restaurant-sign-in'),
     path('restaurant/sign-out/', auth_views.LogoutView.as_view(), {'next_page': '/'}, name = 'restaurant-sign-out'),
@@ -42,9 +42,12 @@ urlpatterns = [
         views.restaurant_add_meal,
         name='restaurant-add-meal'),
 
-    url(r'^restaurant/meal/edit/(?P<meal_id>\d+)/$',
-        views.restaurant_edit_meal,
-        name='restaurant-edit-meal'),
+    path('restaurant/meal/edit/<int:meal_id>/', views.restaurant_edit_meal, name='restaurant-edit-meal'),
+
+
+   # path('restaurant/meal/edit/(?P<meal_id>\d+)/',
+    #    views.restaurant_edit_meal,
+   #     name='restaurant-edit-meal'),
 
     path('restaurant/order/',
         views.restaurant_order,
@@ -62,35 +65,39 @@ urlpatterns = [
 
 
     # Sign In/ Sign Up/ Sign Out
-    url(r'^api/social/', include('rest_framework_social_oauth2.urls')),
+  
     # /convert-token (sign in/ sign up)
     # /revoke-token (sign out)
-    url(r'^api/restaurant/order/notification/(?P<last_request_time>.+)/$',
-        apis.restaurant_order_notification),
+    path('api/restaurant/order/notification/<str:last_request_time>/', apis.restaurant_order_notification),
+
+    #path('api/restaurant/order/notification/(?P<last_request_time>.+)/$',
+    #    apis.restaurant_order_notification),
 
     # REST API to be used with android mobile front ends
 
-    url(r'^api/customer/restaurants/$', apis.customer_get_restaurants),
-    url(r'^api/customer/meals/(?P<restaurant_id>\d+)/$',
-        apis.customer_get_meals),
-    url(r'^api/customer/order/add/$', apis.customer_add_order),
-    url(r'^api/customer/order/latest/$', apis.customer_get_latest_order),
-    url(r'^api/customer/driver/location/$', apis.customer_driver_location),
-    url(r'^api/customer/order/history/$', apis.customer_get_order_history),
-    url(r'^api/customer/profile/update/$', apis.customer_update_profile),
-    url(r'^api/customer/profile/$', apis.customer_get_detais),
+    path('api/customer/restaurants/', apis.customer_get_restaurants),
+    path('api/customer/meals/<int:restaurant_id>/', apis.customer_get_meals),
+
+    #path('api/customer/meals/(?P<restaurant_id>\d+)/',
+    #    apis.customer_get_meals),
+    path('api/customer/order/add/', apis.customer_add_order),
+    path('api/customer/order/latest/', apis.customer_get_latest_order),
+    path('api/customer/driver/location/', apis.customer_driver_location),
+    path('api/customer/order/history/', apis.customer_get_order_history),
+    path('api/customer/profile/update/', apis.customer_update_profile),
+    path('api/customer/profile/', apis.customer_get_detais),
 
     # APIs for DRIVERS
-    url(r'^api/driver/orders/ready/$', apis.driver_get_ready_orders),
-    url(r'^api/driver/order/pick/$', apis.driver_pick_order),
-    url(r'^api/driver/order/latest/$', apis.driver_get_latest_order),
-    url(r'^api/driver/order/complete/$', apis.driver_complete_order),
-    url(r'^api/driver/revenue/$', apis.driver_get_revenue),
-    url(r'^api/driver/location/update/$', apis.driver_update_location),
-    url(r'^api/driver/profile/update/$', apis.driver_update_profile),
-    url(r'^api/driver/profile/view/$', apis.driver_get_profile),
-    url(r'^api/driver/order/history/$', apis.driver_get_order_history),
-    url(r'^api/driver/profile/$', apis.driver_get_detais),
+    path('api/driver/orders/ready/', apis.driver_get_ready_orders),
+    path('api/driver/order/pick/', apis.driver_pick_order),
+    path('api/driver/order/latest/', apis.driver_get_latest_order),
+    path('api/driver/order/complete/', apis.driver_complete_order),
+    path('api/driver/revenue/', apis.driver_get_revenue),
+    path('api/driver/location/update/', apis.driver_update_location),
+    path('api/driver/profile/update/', apis.driver_update_profile),
+    path('api/driver/profile/view/', apis.driver_get_profile),
+    path('api/driver/order/history/', apis.driver_get_order_history),
+    path('api/driver/profile/', apis.driver_get_detais),
 
 
 ]

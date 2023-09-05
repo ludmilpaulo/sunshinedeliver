@@ -516,10 +516,7 @@ def driver_get_profile(request):
 
 
 ##########################################################################################################
-from rest_framework.response import Response
-from rest_framework import status
-
-# ...
+# Import the Request class
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
@@ -547,14 +544,21 @@ def fornecedor_sign_up(request, format=None):
         if licenca:
             request.data['restaurant_license'] = licenca
 
-        serializer = RestaurantSerializer(data=request.data)
+        # Pass the request object to the serializer
+        serializer = RestaurantSerializer(data=request.data, context={'request': request})
+
         if serializer.is_valid():
             # Create the Restaurant object with the user field set
             serializer.validated_data['user'] = new_user
             restaurant = serializer.save()
 
+            # Ensure that the logo field is set in the restaurant object
+            if logo:
+                restaurant.logo = logo
+                restaurant.save()
+
             # Serialize the Restaurant object into a dictionary
-            restaurant_data = RestaurantSerializer(restaurant).data
+            restaurant_data = RestaurantSerializer(restaurant, context={'request': request}).data
 
             # Authenticate the user after saving the data
             user = authenticate(username=username, password=password)

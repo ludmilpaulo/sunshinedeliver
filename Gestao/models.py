@@ -48,7 +48,7 @@ class Category(models.Model):
 
 
 class Restaurant(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='usuário')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='usuário',blank=True)
     name = models.CharField(max_length=500, verbose_name='Nome do restaurante')
     phone = models.CharField(max_length=500, verbose_name='Telefone do restaurante')
     address = models.CharField(max_length=500, verbose_name='Endereço do restaurante')

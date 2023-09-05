@@ -106,17 +106,22 @@ class DriverSerializer(serializers.ModelSerializer):
 
 
 # Convert each Restaurant and menu to JSON for REST API
+
+
 class RestaurantSerializer(serializers.ModelSerializer):
     logo = serializers.SerializerMethodField()
 
     def get_logo(self, restaurant):
         request = self.context.get('request')
-        logo_url = restaurant.logo.url
-        return request.build_absolute_uri(logo_url)
+        if restaurant.logo:
+            logo_url = restaurant.logo.url
+            return request.build_absolute_uri(logo_url)
+        return None  # Return None if 'logo' doesn't exist
 
     class Meta:
         model = Restaurant
-        fields = ("name", "phone", "address", "logo", "restaurant_license")
+        fields = '__all__'
+
 
 
 # Convert each meal to JSON for REST API

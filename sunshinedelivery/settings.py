@@ -64,12 +64,6 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL="Gestao.User"
 
 
-REST_SESSION_LOGIN = False
-
-
-
-
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -173,8 +167,6 @@ LOGIN_REDIRECT_URL = '/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHENTICATION_BACKENDS = (
-    'social.backends.facebook.FacebookOAuth2',
-    'rest_framework_social_oauth2.backends.DjangoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
    
 )

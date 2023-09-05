@@ -18,6 +18,8 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.views import APIView
 from rest_framework.parsers import *
+from rest_framework import serializers
+
 
 from .models import Restaurant, Meal, Order, OrderDetails
 from .serializers import *
@@ -514,9 +516,11 @@ def driver_get_profile(request):
 
 
 ##########################################################################################################
+from rest_framework.response import Response
+from rest_framework import status
 
+# ...
 
-@csrf_exempt
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
 @permission_classes([AllowAny])
@@ -527,14 +531,14 @@ def fornecedor_sign_up(request, format=None):
         password = request.data.get("password")
 
         if not username or not password:
-            return Response({"error": "Nome de usuário e senha são necessários."}, status=400)
+            return Response({"error": "Nome de usuário e senha são necessários."}, status=status.HTTP_400_BAD_REQUEST)
 
         if User.objects.filter(username=username).exists():
-            return Response({"error": "O nome de usuário já existe."}, status=400)
+            return Response({"error": "O nome de usuário já existe."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create the User object
         new_user = User.objects.create_user(username=username, password=password, email=email)
-    
+
         # Handle uploaded files
         logo = request.FILES.get('logo', None)
         licenca = request.FILES.get('restaurant_license', None)
@@ -545,12 +549,12 @@ def fornecedor_sign_up(request, format=None):
 
         serializer = RestaurantSerializer(data=request.data)
         if serializer.is_valid():
-            # Save the Restaurant object
+            # Create the Restaurant object with the user field set
+            serializer.validated_data['user'] = new_user
             restaurant = serializer.save()
 
-            # Associate the User with the Restaurant
-            restaurant.user = new_user
-            restaurant.save()
+            # Serialize the Restaurant object into a dictionary
+            restaurant_data = RestaurantSerializer(restaurant).data
 
             # Authenticate the user after saving the data
             user = authenticate(username=username, password=password)
@@ -559,14 +563,18 @@ def fornecedor_sign_up(request, format=None):
                     "token": Token.objects.get(user=user).key,
                     'user_id': user.pk,
                     "message": "Conta criada com sucesso",
-                    "fornecedor_id": restaurant.nome_fornecedor,
+                    "fornecedor_id": restaurant_data,  # Include the serialized restaurant data
                     'username': user.username,
                     "status": "201"
-                }, status=201)
+                }, status=status.HTTP_201_CREATED)
             else:
-                return Response({"error": "Falha na autenticação."}, status=400)
-        
-        return Response(serializer.errors, status=400)
+                return Response({"error": "Falha na autenticação."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
 
 
 

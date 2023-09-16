@@ -176,7 +176,8 @@ class Driver(models.Model):
 class Meal(models.Model):
     category = models.ForeignKey(Category,
                                     related_name='meal',
-                                    on_delete=models.CASCADE)
+                                    on_delete=models.CASCADE,
+                                    null=True)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, verbose_name='restaurante')
     name = models.CharField(max_length=500, verbose_name='Nome')
     short_description = models.CharField(max_length=500, verbose_name='Pequena descrição')

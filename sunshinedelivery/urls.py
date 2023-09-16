@@ -21,6 +21,14 @@ urlpatterns = [
     path('logout/', apis.LogoutView.as_view(), name='logout-view'),
     ##############################################
     path('fornecedor/', apis.fornecedor_sign_up),
+    path('api/get_fornecedor/', apis.get_fornecedor, name='get_fornecedor'),
+    path('api/get_products/', apis.ProdutoListView.as_view()),
+    path('api/add-product/', apis.fornecedor_add_product, name='fornecedor-add-product'),
+    path('api/get_products/', apis.restaurant_get_meals, name='fornecedor-get-product'),
+    
+    path('api/delete-product/<int:pk>/', apis.delete_product, name='fornecedor-delete-product'),
+   # path('api/edit-product/', apis.edit_product),
+    path('api/categorias/', apis.CategoriaListCreate.as_view(), name='categoria-list-create'),
 
     ############################################################
 

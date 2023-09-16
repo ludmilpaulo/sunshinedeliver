@@ -10,13 +10,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Restaurant, \
-    Meal, \
-    Customer, \
-    Driver, \
-    Order, \
-    OrderDetails, \
-    User
+from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -91,42 +85,23 @@ class DriverSerializer(serializers.ModelSerializer):
 
 
 
-# class UserSerializerWithToken(UserSerializer):
-#     token = serializers.SerializerMethodField(read_only=True)
-
-#     class Meta:
-#         model = User
-#         fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin', 'token']
-
-#     def get_token(self, obj):
-#         token = RefreshToken.for_user(obj)
-#         return str(token.access_token)
-
-#############################################################################
-
-
 # Convert each Restaurant and menu to JSON for REST API
-
 
 class RestaurantSerializer(serializers.ModelSerializer):
     logo = serializers.SerializerMethodField()
 
     def get_logo(self, restaurant):
         request = self.context.get('request')
-        if restaurant.logo:
-            logo_url = restaurant.logo.url
-            return request.build_absolute_uri(logo_url)
-        return None  # Return None if 'logo' doesn't exist
+        logo_url = restaurant.logo.url
+        return request.build_absolute_uri(logo_url)
 
     class Meta:
         model = Restaurant
-        fields = '__all__'
-
+        fields = ("id", "name", "phone", "address", "logo")
 
 
 # Convert each meal to JSON for REST API
 class MealSerializer(serializers.ModelSerializer):
-    category = serializers.StringRelatedField(required=False, allow_null=True)
     image = serializers.SerializerMethodField()
 
     def get_image(self, meal):
@@ -136,7 +111,12 @@ class MealSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meal
-        fields = ("id", "name", "short_description", "image", "price", "quantity", "category")
+        fields = ("id", "name", "short_description", "image", "price", "quantity")
+
+
+
+
+
 
 
 
@@ -191,3 +171,9 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ("id", "customer", "restaurant", "driver", "order_details",
                   "total", "status", "address")
+        
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'

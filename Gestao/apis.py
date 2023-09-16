@@ -2,15 +2,19 @@ import json
 from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 
 from .permissions import *
 
 from rest_framework import status, generics, permissions, viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.decorators import *
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
+from rest_framework.generics import ListAPIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 from django.contrib.auth import authenticate
@@ -21,10 +25,11 @@ from rest_framework.parsers import *
 from rest_framework import serializers
 
 
-from .models import Restaurant, Meal, Order, OrderDetails
+from .models import Restaurant, Meal, Order, OrderDetails, Category
 from .serializers import *
 
-import stripe
+from .authentication import CustomAuthentication
+
 from sunshinedelivery.settings import STRIPE_API_KEY
 
 from django.contrib.auth import get_user_model
@@ -62,7 +67,8 @@ class CustomerSignupView(generics.GenericAPIView):
             'user_id':user.pk,
             "message":"Conta criada com sucesso",
             'username':user.username,
-            "status":"201"
+            "status":"201",
+            "is_customer":user.is_customer
         })
 
 class CustomAuthToken(ObtainAuthToken):
@@ -575,6 +581,147 @@ def fornecedor_sign_up(request, format=None):
                 return Response({"error": "Falha na autenticação."}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+def get_fornecedor(request):
+    usuario_id = request.GET.get('user_id')
+
+    # Check if the usuario_id parameter is provided
+    if usuario_id:
+        fornecedores = Restaurant.objects.filter(user=usuario_id)
+    else:
+        fornecedores = Restaurant.objects.all()
+
+    serialized_data = RestaurantSerializer(
+        fornecedores,
+        many=True,
+        context={"request": request}
+    ).data
+
+    return JsonResponse({"fornecedor": serialized_data})
+
+
+
+
+
+class ProdutoListView(ListAPIView):
+    serializer_class = MealSerializer
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get('user_id', None)  # Get user_id from the request parameters
+
+        # Get the user object from the user_id
+        user = get_object_or_404(User, id=user_id)
+
+        return Meal.objects.filter(restaurant=user.restaurant).order_by("-id")
+    
+def restaurant_get_meals(request):
+    data = request.data
+      # Retrieve the user associated with the access token
+    access = Token.objects.get(key=data['access_token']).user
+
+    # Retrieve the restaurant associated with the user
+    restaurant = access.restaurant
+
+
+    meals = MealSerializer(
+        Meal.objects.filter(restaurant_id=restaurant.id),
+        many=True,
+        context={
+            "request": request
+        }).data
+
+    return JsonResponse({"meals": meals})
+
+class CategoriaListCreate(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+
+
+from django.db import IntegrityError
+
+
+# Your view function
+@api_view(["POST"])
+@parser_classes([JSONParser, MultiPartParser, FormParser, FileUploadParser])
+def fornecedor_add_product(request, format=None):
+    data = request.data
+
+    try:
+        # Retrieve the user associated with the access token
+        access = Token.objects.get(key=data['access_token']).user
+
+        # Retrieve the restaurant associated with the user
+        restaurant = access.restaurant
+
+        # Retrieve or create the category based on the slug
+        category_slug = data['category']
+        try:
+            category = Category.objects.get(slug=category_slug)
+        except Category.DoesNotExist:
+            category = Category.objects.create(slug=category_slug, name=category_slug)
+
+        # Create a new meal for the restaurant
+        meal = Meal(
+            restaurant=restaurant,
+            category=category,
+            name=data['name'],
+            short_description=data['short_description'],
+            price=data['price'],
+            image=data['image'],
+        )
+
+        try:
+            # Try to save the meal
+            meal.save()
+        except IntegrityError:
+            # If there is a unique constraint violation (e.g., duplicate name), you can handle it here
+            return Response({'error': 'Meal with the same name already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"status": "Os Seus Dados enviados com sucesso"}, status=status.HTTP_201_CREATED)
+
+    except Token.DoesNotExist:
+        return Response({'error': 'Invalid access token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+    
+
+
+@api_view(['DELETE'])
+#@permission_classes([IsAuthenticated])
+def delete_product(request, pk):
+    try:
+        # Authenticate the user using the user_id from the request
+        user_id = request.data.get('user_id')
+        if not user_id:
+            return Response({'error': 'user_id not provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get(pk=user_id)
+
+        # Check if the user has permission to delete the product
+        product = Meal.objects.get(pk=pk)
+        if not hasattr(user, 'restaurant') or user.restaurant != meal.restaurant:
+            return Response({'error': 'User does not have permission to delete this product'}, status=status.HTTP_403_FORBIDDEN)
+
+        # User is authenticated and has permission, delete the product
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Meal.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+
 
 
 

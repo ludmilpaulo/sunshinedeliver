@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'corsheaders',
 
-   # 'bootstrap5',
+    'bootstrap5',
     'Gestao',
     'accounts',
 

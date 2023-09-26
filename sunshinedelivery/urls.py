@@ -27,6 +27,10 @@ urlpatterns = [
     path('api/get_products/', apis.restaurant_get_meals, name='fornecedor-get-product'),
     
     path('api/delete-product/<int:pk>/', apis.delete_product, name='fornecedor-delete-product'),
+    path('api/restaurant/status/', apis.restaurant_order, name='restaurant_order_api'),
+    path('api/restaurant/orders/',apis.OrderListView.as_view()),
+
+
    # path('api/edit-product/', apis.edit_product),
     path('api/categorias/', apis.CategoriaListCreate.as_view(), name='categoria-list-create'),
 

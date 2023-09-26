@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
+from django.db import IntegrityError
 
 from .permissions import *
 
@@ -18,7 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.views import APIView
 from rest_framework.parsers import *
@@ -642,7 +643,7 @@ class CategoriaListCreate(generics.ListCreateAPIView):
 
 
 
-from django.db import IntegrityError
+
 
 
 # Your view function
@@ -693,9 +694,6 @@ def fornecedor_add_product(request, format=None):
 
 
 
-    
-
-
 @api_view(['DELETE'])
 #@permission_classes([IsAuthenticated])
 def delete_product(request, pk):
@@ -709,7 +707,7 @@ def delete_product(request, pk):
 
         # Check if the user has permission to delete the product
         product = Meal.objects.get(pk=pk)
-        if not hasattr(user, 'restaurant') or user.restaurant != meal.restaurant:
+        if not hasattr(user, 'restaurant') or user.restaurant != product.restaurant:
             return Response({'error': 'User does not have permission to delete this product'}, status=status.HTTP_403_FORBIDDEN)
 
         # User is authenticated and has permission, delete the product
@@ -720,6 +718,47 @@ def delete_product(request, pk):
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     except Meal.DoesNotExist:
         return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+
+
+
+@api_view(['POST'])
+def restaurant_order(request, format=None):
+     # Print the user to verify if it's retrieved correctly
+    data = request.data
+    user = get_object_or_404(User, id=data['user_id'])
+    print(data)
+
+    try:
+        order = Order.objects.get(id=data["id"],
+                                restaurant=user.restaurant)
+
+        if order.status == Order.COOKING:
+            order.status = Order.READY
+            order.save()
+
+        orders = Order.objects.filter(
+        restaurant=user.restaurant).order_by("-id")
+
+        return Response({'message': 'Order status updated to READY'}, status=status.HTTP_200_OK)
+
+    except Order.DoesNotExist:
+        return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class OrderListView(ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get('user_id', None)  # Get user_id from the request parameters
+
+        # Get the user object from the user_id
+        user = get_object_or_404(User, id=user_id)
+
+        return Order.objects.filter(restaurant=user.restaurant).order_by("-id")
+
+
+
     
 
 

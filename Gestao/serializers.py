@@ -115,21 +115,13 @@ class MealSerializer(serializers.ModelSerializer):
 
 
 
-
-
-
-
-
-
-
-
 # ORDER SERIALIZER
 class OrderCustomerSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField(source="user.get_full_name")
 
     class Meta:
         model = Customer
-        fields = ("id", "name", "avatar", "phone", "address")
+        fields = ("id", "name",  "avatar", "phone", "address")
 
 
 class OrderDriverSerializer(serializers.ModelSerializer):

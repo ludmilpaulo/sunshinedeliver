@@ -18,13 +18,7 @@ class RestaurantAdmin(admin.ModelAdmin):
     get_user_username.short_description = 'User'
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'get_address')
 
-    def get_address(self, obj):
-        return obj.restaurant.address
-
-    get_address.short_description = 'Address'
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
